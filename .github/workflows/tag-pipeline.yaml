@@ -1,3 +1,4 @@
+# Define workflow that only triggers the Ci-CD pipeline if it's a tag push
 name: CI / CD Pipeline
 run-name: ${{ github.actor }} is Deploying 🚀
 on:

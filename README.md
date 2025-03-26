@@ -27,7 +27,7 @@ Steps to build a pipeline of a node project that creates and publishes a docker 
     - Docker Login (with secret credentials)
     - Docker Build & Docker Push
     - Configure AWS (with secret credentials)
-    - Replace the "image" variable in the k8s template
+    - Replace the "image" variable in the k8s deployment template i.e. image: ${IMAGE_NAME}
     - Install kubectl
     - Apply the deployment + service
 4. Build the workflow
