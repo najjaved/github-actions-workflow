@@ -9,11 +9,12 @@ Steps to build a pipeline of a node project that creates and publishes a docker 
 2. Run `npm init -y`. This will generate a package.json file, modify according to your needs e.g. add start scripts
 3. Ensure npm start works
 4. Create the Dockerfile
-5. Create the Kubernetes Deployment + Service to expose the delployment
+5. Create the Kubernetes Deployment + Service to expose the deployment
+6. Create Workflow- ci-cd pipeline
 
 # To Enable the Workflow
 
-1. Make sure your GitHub Repository is updated with your local code
+1. Make sure your GitHub Repository is updated with your local code-commit your changes
 2. Add Repo Secrets in Settings > Secrets and Variables > Actions:
     - DOCKER_USERNAME
     - DOCKER_PASSWORD
@@ -24,8 +25,7 @@ Steps to build a pipeline of a node project that creates and publishes a docker 
 3. Review the steps of your workflow:
     - Checkout Code
     - Docker Login (with secret credentials)
-    - Docker Build
-    - Docker Push
+    - Docker Build & Docker Push
     - Configure AWS (with secret credentials)
     - Replace the "image" variable in the k8s template
     - Install kubectl

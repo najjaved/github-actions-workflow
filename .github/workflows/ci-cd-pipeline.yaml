@@ -1,0 +1,55 @@
+name: CI / CD Pipeline
+run-name: ${{ github.actor }} is Deploying 🚀
+on:
+    push: 
+        branches:
+            - main 
+    workflow_dispatch:
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout Code
+          uses: actions/checkout@v4
+
+        - name: Login to Docker Hub
+          uses: docker/login-action@v3
+          with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+
+        - name: Build and push
+          uses: docker/build-push-action@v6
+          with:
+            push: true
+            tags: ${{ secrets.DOCKER_USERNAME }}/simple-node-app:latest
+
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v4
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_REGION }}
+
+        - name: Generate the final deployment template
+          run: |
+            sudo apt-get update
+            sudo apt-get install -y gettext-base
+            export IMAGE_NAME="docker.io/${{ secrets.DOCKER_USERNAME }}/simple-node-app:latest"
+            envsubst < deployment.template.yaml > deployment.yaml
+            echo "Final deployment:"
+            cat deployment.yaml
+
+        # We need to:
+            # 1. install kubectl
+            # 2. configure it with aws cli (aws eks)
+            # 3. deploy
+        - name: Deploy to EKS
+          run: |
+            curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.32.0/2024-12-20/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$HOME/bin:$PATH
+            aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.AWS_CLUSTER }}
+            kubectl apply -f deployment.yaml
+          
+        
