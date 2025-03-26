@@ -1,0 +1,10 @@
+{
+  "name": "github-actions-workflow",
+  "version": "1.0.0",
+  "description": "Steps to build a pipeline of a node project that creates and publishes a docker image and deploys it in an EKS cluster.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  }
+}
