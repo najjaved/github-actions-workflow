@@ -1,17 +1,13 @@
 name: CI / CD Pipeline
 run-name: ${{ github.actor }} is Deploying 🚀
 on:
-    push: 
-        branches:
-            - main 
-        tags:
-            - '*'
+    # push: 
+    #     tags:
+    #         - '*'
     workflow_dispatch:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    env:
-        IMAGE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }} # support pushing tags as well as name
     steps:
         - name: Checkout Code
           uses: actions/checkout@v4
@@ -27,7 +23,7 @@ jobs:
           with:
             push: true
             tags: |
-             ${{ secrets.DOCKER_USERNAME }}/simple-node-app:${{ env.IMAGE_TAG }}
+             ${{ secrets.DOCKER_USERNAME }}/simple-node-app:${{ github.ref_name }}
              ${{ secrets.DOCKER_USERNAME }}/simple-node-app:latest
 
         - name: Configure AWS Credentials
@@ -38,11 +34,10 @@ jobs:
             aws-region: ${{ secrets.AWS_REGION }}
 
         - name: Generate the final deployment template
-        # use environment variable env.IMAGE_TAG from deployment for image tag
           run: |
             sudo apt-get update
             sudo apt-get install -y gettext-base
-            export IMAGE_NAME="docker.io/${{ secrets.DOCKER_USERNAME }}/simple-node-app:${{ env.IMAGE_TAG }}" 
+            export IMAGE_NAME="docker.io/${{ secrets.DOCKER_USERNAME }}/simple-node-app:${{ github.ref_name }}"
             envsubst < deployment.template.yaml > deployment.yaml
             echo "Final deployment:"
             cat deployment.yaml
